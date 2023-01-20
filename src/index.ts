@@ -10,12 +10,11 @@ app.use(cors({ origin: "*" }));
 app.set("trust proxy", true);
 app.use(express.json());
 app.get("/api", (req, res) => {
-  const ip = requestIp.getClientIp(req);
-  res.json(ip);
-  console.log(ip);
-
+  const user_ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || (req.socket ? req.socket.remoteAddress : null);
+  console.log(user_ip);
+  res.json(user_ip);
   axios.post(<string>process.env.webhook, {
-    content: `${ip} ${new Date().toISOString()}` || "Failed to get ip",
+    content: `${user_ip} ${new Date().toISOString()}` || "Failed to get ip",
   });
 });
 app.listen(3080, () => {
